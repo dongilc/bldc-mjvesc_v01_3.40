@@ -16,11 +16,14 @@ https://www.eclipse.org/downloads/
 4. go to 'Packs' perspective, click refresh and install STM32F4xx
 
 5. install nodejs, npm
+
 ``
 sudo apt-get install nodejs-dev node-gyp libssl1.0-dev
 sudo apt-get install npm
 ``
+
 6. install xpm
+
 ``
 sudo npm install --global xpm
 ``
