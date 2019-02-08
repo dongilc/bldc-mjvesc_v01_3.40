@@ -9,7 +9,7 @@ http://vesc-project.com/
 
 2. install eclipse
 
-https://www.eclipse.org/downloads/
+   https://www.eclipse.org/downloads/
 
 3. install 'gnu-arm-mcu' plugin at help -> eclipse market place
 
