@@ -10,9 +10,11 @@ http://vesc-project.com/
    
    `sudo apt-get update`
 
-2. install toolchain
+2. install toolchain and dependencies
       
    `sudo apt-get install gcc-arm-embedded`
+   
+   `sudo apt-get install build-essential openocd git libudev-dev libqt5serialport5-dev`
 
 3. build and run test at source code folder
 
