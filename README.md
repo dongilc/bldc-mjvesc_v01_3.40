@@ -14,7 +14,7 @@ http://vesc-project.com/
       
    `sudo apt-get install gcc-arm-embedded`
 
-3. build and run test
+3. build and run test at source code folder
 
    `make upload`
 
