@@ -37,7 +37,6 @@ http://vesc-project.com/
     `xpm install --global @gnu-mcu-eclipse/windows-build-tools`
     
     
-    
 ## eclipse setting @ ubuntu, 2019-02-08
 1. install jdk
 
@@ -70,3 +69,12 @@ http://vesc-project.com/
     `xpm install --global @gnu-mcu-eclipse/openocd`
     
     
+    
+## Build Test
+1. open eclipse
+
+2. file -> import -> c/c++ -> Existing Code as Makefile Project
+
+3. Browse and select target folder, and set 'Toolchain for Indexer Setting' -> 'Arm Cross GCC'
+
+4. 
