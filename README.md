@@ -17,9 +17,9 @@ https://www.eclipse.org/downloads/
 
 5. install nodejs, npm
 
-    ``sudo apt-get install nodejs-dev node-gyp libssl1.0-dev``
+    ``sudo apt-get install nodejs-dev node-gyp libssl1.0-dev
     
-    ``sudo apt-get install npm``
+    sudo apt-get install npm``
 
 6. install xpm
 
