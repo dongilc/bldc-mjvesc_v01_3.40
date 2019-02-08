@@ -5,7 +5,7 @@ http://vesc-project.com/
 # eclipse setting, 2019-02-08
 1. install jdk
 
-``sudo apt install openjdk-11-jdk``
+    ``sudo apt install openjdk-11-jdk``
 
 2. install eclipse
 
@@ -17,13 +17,9 @@ https://www.eclipse.org/downloads/
 
 5. install nodejs, npm
 
-``
-sudo apt-get install nodejs-dev node-gyp libssl1.0-dev
-sudo apt-get install npm
-``
+    ``sudo apt-get install nodejs-dev node-gyp libssl1.0-dev``
+    ``sudo apt-get install npm``
 
 6. install xpm
 
-``
-sudo npm install --global xpm
-``
+    ``sudo npm install --global xpm``
