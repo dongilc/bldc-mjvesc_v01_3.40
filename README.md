@@ -77,4 +77,18 @@ http://vesc-project.com/
 
 3. Browse and select target folder, and set 'Toolchain for Indexer Setting' -> 'Arm Cross GCC'
 
-4. 
+4. right click at project folder imported, select properties
+
+5. C/C++ Build -> Settings -> Devices, Select Devices -> STMicroelectronics -> STM32F4 Series -> STM32F407 (in case of mjvesc) -> Apply
+
+6. right click at project folder imported, select build project
+
+7. right click at project folder imported, select Run As -> Run Configuration
+
+8. double click 'GDB OpenOCD Debugging'
+
+9. select tab 'Debugger' and type below at 'Config options'
+
+   `-f board/stm32f4discovery.cfg`
+   
+10. Click Run
