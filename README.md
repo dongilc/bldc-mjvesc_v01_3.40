@@ -87,7 +87,7 @@ http://vesc-project.com/
     
     
     
-## Build Test
+## eclipse build&run Test
 1. open eclipse
 
 2. file -> import -> c/c++ -> Existing Code as Makefile Project
