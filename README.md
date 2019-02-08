@@ -4,7 +4,7 @@ http://vesc-project.com/
 
 # eclipse setting, 2019-02-08
 1. install jdk
-sudo apt install openjdk-11-jdk
+``sudo apt install openjdk-11-jdk``
 
 2. install eclipse
 https://www.eclipse.org/downloads/
