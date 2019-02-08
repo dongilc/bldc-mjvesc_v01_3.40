@@ -3,6 +3,23 @@ http://vesc-project.com/
 ## bldc-mjvesc_v01_3.40
 
 
+## Build GNU-ARM at Terminal - Easy way but no gui, 2019-02-08
+1. add repository and update
+
+   `sudo add-apt-repository ppa:team-gcc-arm-embedded/ppa`
+   
+   `sudo apt-get update`
+
+2. install toolchain
+      
+   `sudo apt-get install gcc-arm-embedded`
+
+3. build and run test
+
+   `make upload`
+
+
+
 ## eclipse setting @ windows, 2019-02-08
 1. install jdk
 
