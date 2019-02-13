@@ -1652,7 +1652,8 @@ void mcpwm_foc_adc_int_handler(void *p, uint32_t flags) {
 	const float phase_diff = utils_angle_difference_rad(m_motor_state.phase, phase_before);
 	phase_before = m_motor_state.phase;
 
-	if (m_state == MC_STATE_RUNNING) {
+	if (m_state == MC_STATE_RUNNING)
+	{
 		// Clarke transform assuming balanced currents
 		m_motor_state.i_alpha = ia;
 		m_motor_state.i_beta = ONE_BY_SQRT3 * ia + TWO_BY_SQRT3 * ib;
@@ -1736,7 +1737,7 @@ void mcpwm_foc_adc_int_handler(void *p, uint32_t flags) {
 			}
 		}
 
-		// Run observer
+		// Run observer //if (m_state == MC_STATE_RUNNING)
 		if (!m_phase_override) {
 			observer_update(m_motor_state.v_alpha, m_motor_state.v_beta,
 					m_motor_state.i_alpha, m_motor_state.i_beta, dt,
@@ -1869,7 +1870,7 @@ void mcpwm_foc_adc_int_handler(void *p, uint32_t flags) {
 		m_motor_state.i_abs = 0.0;
 		m_motor_state.i_abs_filter = 0.0;
 
-		// Run observer
+		// Run observer // else {if (m_state == MC_STATE_RUNNING)}
 		observer_update(m_motor_state.v_alpha, m_motor_state.v_beta,
 				m_motor_state.i_alpha, m_motor_state.i_beta, dt, &m_observer_x1,
 				&m_observer_x2, &m_phase_now_observer);

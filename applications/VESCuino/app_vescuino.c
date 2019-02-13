@@ -244,8 +244,18 @@ static void cmd_is_encoder_index_found(BaseSequentialStream *chp, int argc, char
 		return;
 	}
 
-	chprintf(chp, "sensor_mode <0=sensorless, 1=encoder, 2=hall>, encoder_offset:%.2f\r\n", (double)app_vescuino_dps_get_enc_offset());
+	chprintf(chp, "sensor_mode<0=sensorless, 1=encoder, 2=hall>, encoder_offset:%.2f\r\n", (double)app_vescuino_dps_get_enc_offset());
 	chprintf(chp, "sensor_mode:%d, enc_is_configured:%d, encoder_deg:%.2f deg, enc_index_found:%d\r\n", mcpwm_foc_check_sensor_mode(), encoder_is_configured(), (double)encoder_read_deg(), encoder_index_found());
+}
+
+static void cmd_pid_control_info(BaseSequentialStream *chp, int argc, char *argv[]) {
+	(void)argv;
+	if (argc > 0) {
+		chprintf(chp, "Usage: pif <print pid control infomation>\r\n");
+		return;
+	}
+
+	chprintf(chp, "pid_pos_now=%.2f, pid_pos_set=%.2f\r\n", (double)mcpwm_foc_get_pid_pos_now(), (double)mcpwm_foc_get_pid_pos_set());
 }
 
 static void cmd_imu_mpu9250_use_mode(BaseSequentialStream *chp, int argc, char *argv[]) {
@@ -522,6 +532,7 @@ static const ShellCommand commands[] = {
   {"rb", cmd_reboot},
   {"gpn", cmd_get_polepair_num},
   {"ind", cmd_is_encoder_index_found},
+  {"pif", cmd_pid_control_info},
   {"lcd", cmd_can_dev_print},
   {"dev", cmd_spi_devel_print},
   {"sdp", cmd_spi_debug_print},
