@@ -25,6 +25,14 @@ http://vesc-project.com/
 ## 2-1. eclipse setting @ ubuntu, 2019-02-08
 1. install jdk
 
+    @ ubuntu 16.04
+    
+    `sudo add-apt-repository ppa:webupd8team/java`
+    `sudo apt update`
+    `sudo apt install oracle-java8-installer`
+    
+    @ ubuntu 18.04
+    
     `sudo apt install openjdk-11-jdk`
 
 2. install eclipse
