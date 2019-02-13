@@ -4,7 +4,7 @@ http://vesc-project.com/
 
 ### I strongly recommend to use ubuntu 16.04.5 LTS.
 
-## Build GNU-ARM at Terminal - Easy way but no gui, 2019-02-08
+## 1. Build GNU-ARM at Terminal - Easy way but no gui, 2019-02-08
 1. add repository and update
 
    `sudo add-apt-repository ppa:team-gcc-arm-embedded/ppa`
@@ -22,8 +22,40 @@ http://vesc-project.com/
    `make upload`
 
 
+## 2-1. eclipse setting @ ubuntu, 2019-02-08
+1. install jdk
 
-## eclipse setting @ windows, 2019-02-08
+    `sudo apt install openjdk-11-jdk`
+
+2. install eclipse
+
+   https://www.eclipse.org/downloads/
+
+3. install 'gnu-arm-mcu' plugin at help -> eclipse market place
+
+4. go to 'Packs' perspective, click refresh and install STMicroelectronics->Keil->STM32F4xx_DFP
+
+5. install nodejs, npm
+
+    `sudo apt-get install nodejs-dev node-gyp libssl1.0-dev`
+    
+    `sudo apt-get install npm`
+
+6. install xpm
+
+    `sudo npm install --global xpm`
+    
+7. install ARM toolchain
+
+    `xpm install --global @gnu-mcu-eclipse/arm-none-eabi-gcc`
+    
+8. install openocd
+
+    `xpm install --global @gnu-mcu-eclipse/openocd`
+    
+  
+
+## 2-2. eclipse setting @ windows, 2019-02-08
 1. install jdk
 
    https://www.oracle.com/technetwork/java/javase/downloads/index.html
@@ -57,40 +89,8 @@ http://vesc-project.com/
     `xpm install --global @gnu-mcu-eclipse/windows-build-tools`
     
     
-## eclipse setting @ ubuntu, 2019-02-08
-1. install jdk
-
-    `sudo apt install openjdk-11-jdk`
-
-2. install eclipse
-
-   https://www.eclipse.org/downloads/
-
-3. install 'gnu-arm-mcu' plugin at help -> eclipse market place
-
-4. go to 'Packs' perspective, click refresh and install STMicroelectronics->Keil->STM32F4xx_DFP
-
-5. install nodejs, npm
-
-    `sudo apt-get install nodejs-dev node-gyp libssl1.0-dev`
     
-    `sudo apt-get install npm`
-
-6. install xpm
-
-    `sudo npm install --global xpm`
-    
-7. install ARM toolchain
-
-    `xpm install --global @gnu-mcu-eclipse/arm-none-eabi-gcc`
-    
-8. install openocd
-
-    `xpm install --global @gnu-mcu-eclipse/openocd`
-    
-    
-    
-## eclipse build&run Test
+## 2-3. eclipse build&run Test
 1. open eclipse
 
 2. file -> import -> c/c++ -> Existing Code as Makefile Project
