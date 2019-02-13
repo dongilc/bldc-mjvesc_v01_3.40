@@ -28,7 +28,9 @@ http://vesc-project.com/
     @ ubuntu 16.04
     
     `sudo add-apt-repository ppa:webupd8team/java`
+    
     `sudo apt update`
+    
     `sudo apt install oracle-java8-installer`
     
     @ ubuntu 18.04
