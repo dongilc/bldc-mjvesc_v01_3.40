@@ -2,6 +2,7 @@ This is the source code for the VESC DC/BLDC/FOC controller. Read more at
 http://vesc-project.com/
 ## bldc-mjvesc_v01_3.40
 
+### I strongly recommend to use ubuntu 16.04.5 LTS.
 
 ## Build GNU-ARM at Terminal - Easy way but no gui, 2019-02-08
 1. add repository and update
