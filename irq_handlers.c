@@ -33,7 +33,6 @@ CH_IRQ_HANDLER(ADC1_2_3_IRQHandler) {
 	CH_IRQ_EPILOGUE();
 }
 
-#ifndef HW_HAS_HALL_ENC_HYBRID
 CH_IRQ_HANDLER(HW_ENC_EXTI_ISR_VEC) {
 	if (EXTI_GetITStatus(HW_ENC_EXTI_LINE) != RESET) {
 		encoder_reset();
@@ -42,16 +41,6 @@ CH_IRQ_HANDLER(HW_ENC_EXTI_ISR_VEC) {
 		EXTI_ClearITPendingBit(HW_ENC_EXTI_LINE);
 	}
 }
-#else
-CH_IRQ_HANDLER(HW_ENC_EXTI_ISR_VEC) {
-	if (EXTI_GetITStatus(HW_ENC_EXTI_LINE) != RESET) {
-		encoder_reset();
-
-		// Clear the EXTI line pending bit
-		EXTI_ClearITPendingBit(HW_ENC_EXTI_LINE);
-	}
-}
-#endif
 
 CH_IRQ_HANDLER(HW_ENC_TIM_ISR_VEC) {
 	if (TIM_GetITStatus(HW_ENC_TIM, TIM_IT_Update) != RESET) {

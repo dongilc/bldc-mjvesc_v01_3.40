@@ -240,12 +240,16 @@ static void cmd_get_polepair_num(BaseSequentialStream *chp, int argc, char *argv
 static void cmd_is_encoder_index_found(BaseSequentialStream *chp, int argc, char *argv[]) {
 	(void)argv;
 	if (argc > 0) {
-		chprintf(chp, "Usage: ind <print whether encoder index found>\r\n");
+		chprintf(chp, "Usage: ind <print encoder index information>\r\n");
 		return;
 	}
 
-	chprintf(chp, "sensor_mode<0=sensorless, 1=encoder, 2=hall>, encoder_offset:%.2f\r\n", (double)app_vescuino_dps_get_enc_offset());
-	chprintf(chp, "sensor_mode:%d, enc_is_configured:%d, encoder_deg:%.2f deg, enc_index_found:%d\r\n", mcpwm_foc_check_sensor_mode(), encoder_is_configured(), (double)encoder_read_deg(), encoder_index_found());
+	chprintf(chp, "sensor_mode<0=sensorless, 1=encoder, 2=hall>, sensor_mode:%d\r\n", mcpwm_foc_check_sensor_mode());
+	chprintf(chp, "enc_is_configured:%d, enc_index_found:%d, hall_enc_hybrid_switch:%d\r\n",
+			encoder_is_configured(), encoder_index_found(), encoder_is_hall_enc_switched());
+	chprintf(chp, "encoder_deg_now:%.2f, encoder_deg_offset:%.2f\r\n",
+			(double)encoder_read_deg(), (double)app_vescuino_dps_get_enc_offset());
+
 }
 
 static void cmd_pid_control_info(BaseSequentialStream *chp, int argc, char *argv[]) {

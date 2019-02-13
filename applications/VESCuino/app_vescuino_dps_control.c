@@ -15,7 +15,7 @@ static float dps_now;
 static float deg_now;
 static float deg_total;
 static float dps_target;
-static float dps_enc_offset;
+static float dps_enc_offset_deg;
 static int dps_set_flag = 0;
 static int count = 0;
 
@@ -32,12 +32,12 @@ void app_vescuino_set_dps_thread_start(void)
 
 void app_vescuino_dps_set_enc_offset(float offset)
 {
-	dps_enc_offset = offset;
+	dps_enc_offset_deg = offset;
 }
 
 float app_vescuino_dps_get_enc_offset(void)
 {
-	return dps_enc_offset;
+	return dps_enc_offset_deg;
 }
 
 //
@@ -55,7 +55,7 @@ float genProfile(float *deg_tacho, float *deg_prof, float *dps_prof, float dps_g
 		while(*deg_prof < 0.) {
 			*deg_prof += 360.;
 		}
-		*deg_tacho += (ds);
+		*deg_tacho += ds;
 		return ds;
 	}
 
@@ -80,7 +80,7 @@ float genProfile(float *deg_tacho, float *deg_prof, float *dps_prof, float dps_g
 	while(*deg_prof < 0.) {
 		*deg_prof += 360.;
 	}
-	*deg_tacho += (ds);
+	*deg_tacho += ds;
 	return ds;
 }
 
@@ -89,8 +89,11 @@ void app_vescuino_set_dps(float dps)
 	//debug_printf("\r> set_dps, dps_target=%.2f, dps_set_flag=%d, count=%d\r\n", (double)dps, dps_set_flag, count);
 
 	dps_target = dps;
+	// run this every first connection of dps control
 	if(dps_set_flag==0) {
 		deg_now = mc_interface_get_pid_pos_now();
+		// reset offset angle when the hall/enc hybrid switch is already switched
+		if(encoder_is_hall_enc_switched()) dps_enc_offset_deg = 0.;
 	}
 	dps_set_flag = 1;
 	count = 0;
@@ -121,9 +124,7 @@ static THD_FUNCTION(dps_control_thread, arg) {
 		genProfile(&deg_total, &deg_now, &dps_now, dps_target, 20000.0, 0.0001);
 
 		if(dps_set_flag) {
-			//if(encoder_index_found())
-			mc_interface_set_pid_pos(deg_now);
-			//else					  mc_interface_set_pid_speed(100.0);
+			mc_interface_set_pid_pos(deg_now - dps_enc_offset_deg);
 			timeout_reset();
 		}
 
@@ -132,6 +133,7 @@ static THD_FUNCTION(dps_control_thread, arg) {
 			count = 0;
 			dps_set_flag = 0;
 			dps_target = 0;
+			dps_enc_offset_deg = 0;	// reset hall/enc hybrid offset for next dps control
 			debug_printf("\r> dps_control timeout\r\n");
 		}
 

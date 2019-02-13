@@ -40,12 +40,12 @@
 //cdi
 // Custom Encoder use.
 #ifdef USE_CUSTOM_ABI_ENCODER_AT_SPI
-#define HW_ENC_A_PORT				HW_SPI_PORT_MISO
-#define HW_ENC_A_PIN				HW_SPI_PIN_MISO
-#define HW_ENC_B_PORT				HW_SPI_PORT_MOSI
-#define HW_ENC_B_PIN				HW_SPI_PIN_MOSI
-#define HW_ENC_I_PORT				HW_SPI_PORT_NSS
-#define HW_ENC_I_PIN				HW_SPI_PIN_NSS
+#define HW_ENC_A_PORT				HW_SPI_PORT_MISO	// HW_SPI_PORT_SCK @VER0.1A
+#define HW_ENC_A_PIN				HW_SPI_PIN_MISO		// HW_SPI_PIN_SCK @VER0.1A
+#define HW_ENC_B_PORT				HW_SPI_PORT_MOSI	// HW_SPI_PORT_MISO @VER0.1A
+#define HW_ENC_B_PIN				HW_SPI_PIN_MOSI		// HW_SPI_PIN_MISO @VER0.1A
+#define HW_ENC_I_PORT				HW_SPI_PORT_NSS		// HW_SPI_PORT_NSS @VER0.1A
+#define HW_ENC_I_PIN				HW_SPI_PIN_NSS		// HW_SPI_PIN_NSS @VER0.1A
 #else
 #define HW_ENC_I_PORT				HW_HALL_ENC_GPIO3
 #define HW_ENC_I_PIN				HW_HALL_ENC_PIN3
@@ -99,6 +99,7 @@ typedef enum {
 
 // Private variables
 static bool index_found = false;
+static bool hall_enc_hybrid_switch = false;
 static uint32_t enc_counts = 10000;
 static encoder_mode mode = ENCODER_MODE_NONE;
 static float last_enc_angle = 0.0;
@@ -152,7 +153,13 @@ void encoder_init_abi(uint32_t counts) {
 	EXTI_InitTypeDef   EXTI_InitStructure;
 
 	// Initialize variables
+	//cdi
+#ifdef USE_CUSTOM_ABI_ENCODER_AT_SPI
+	index_found = true;	// cheat as if encoder index is already found
+	hall_enc_hybrid_switch = false;
+#else
 	index_found = false;
+#endif
 	enc_counts = counts;
 
 #ifndef USE_CUSTOM_ABI_ENCODER_AT_SPI	//cdi
@@ -239,6 +246,10 @@ bool encoder_is_configured(void) {
 	return mode != ENCODER_MODE_NONE;
 }
 
+bool encoder_is_hall_enc_switched(void) {
+	return hall_enc_hybrid_switch;
+}
+
 float encoder_read_deg(void) {
 	static float angle = 0.0;
 
@@ -291,14 +302,23 @@ void encoder_reset(void) {
 				}
 			}
 		} else {
-			app_vescuino_dps_set_enc_offset((double)encoder_read_deg());
 			HW_ENC_TIM->CNT = 0;
 			index_found = true;
 			bad_pulses = 0;
-			//cdi
-#ifdef USE_CUSTOM_ABI_ENCODER_AT_SPI
-			//mcpwm_foc_change_sensor_mode_encoder();	//change foc_sensor_mode from hall to encoder just after encoder index found
-#endif
+		}
+
+		//cdi
+		if ((index_found==true) && (hall_enc_hybrid_switch==false))
+		{
+			app_vescuino_dps_set_enc_offset((double)mc_interface_get_pid_pos_now());
+
+			HW_ENC_TIM->CNT = 0;
+			index_found = true;
+			bad_pulses = 0;
+
+			//change foc_sensor_mode from hall to encoder just after encoder index found
+			mcpwm_foc_change_sensor_mode_encoder();
+			hall_enc_hybrid_switch = true;
 		}
 	}
 }
