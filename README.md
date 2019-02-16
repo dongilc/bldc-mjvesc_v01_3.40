@@ -1,5 +1,6 @@
-This is the source code for the VESC DC/BLDC/FOC controller. Read more at  
-http://vesc-project.com/
+This is the source code for the MJVESC DC/BLDC/FOC controller. This is originated from http://vesc-project.com/.
+More detail description for MJVESC is at https://drcl.mju.ac.kr/research/mjvesc-framework
+
 ## bldc-mjvesc_v01_3.40
 
 ### I strongly recommend to use ubuntu 16.04.5 LTS.
