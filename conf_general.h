@@ -98,7 +98,7 @@
 // Use SPI_MISO(A6):ENC_A, SPI_MOSI(A7):ENC_B, SPI_nCS(A4):ENC_I
 // Initial Commutation is done by Hall Sensor and change the commutation to encoder just after index found
 // Please Enable the comment #define HW_HAS_HALL_ENC_HYBRID @ "hw_60_mjvesc_v01.h"
-#define USE_CUSTOM_ABI_ENCODER_AT_SPI	
+//#define USE_CUSTOM_ABI_ENCODER_AT_SPI	
 // TODO: implement hw spi reading of as5147 
 // (not just using hw pin and sw spi)
 //#define AS5047_USE_HW_SPI_PINS		1	
