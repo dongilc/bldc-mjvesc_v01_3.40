@@ -34,6 +34,10 @@ http://vesc-project.com/
     `sudo apt install oracle-java8-installer`
     
     @ ubuntu 18.04
+
+    `sudo add-apt-repository ppa:linuxuprising/java`
+
+    `sudo apt update`
     
     `sudo apt install openjdk-11-jdk`
 
