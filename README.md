@@ -25,7 +25,7 @@ http://vesc-project.com/
 ## 2-1. eclipse setting @ ubuntu, 2019-02-08
 1. install jdk
 
-    @ ubuntu 16.04
+    @ JDK 8
     
     `sudo add-apt-repository ppa:webupd8team/java`
     
@@ -33,7 +33,7 @@ http://vesc-project.com/
     
     `sudo apt install oracle-java8-installer`
     
-    @ ubuntu 18.04
+    @ JDK 11
 
     `sudo add-apt-repository ppa:linuxuprising/java`
 
