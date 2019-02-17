@@ -50,6 +50,8 @@ More detail description for MJVESC is at https://drcl.mju.ac.kr/research/mjvesc-
 
 4. go to 'Packs' perspective, click refresh and install STMicroelectronics->Keil->STM32F4xx_DFP
 
+@ Easy way - Using xpm (not recommended)
+
 5. install nodejs, npm
 
     `sudo apt-get install nodejs-dev node-gyp libssl1.0-dev`
@@ -67,8 +69,17 @@ More detail description for MJVESC is at https://drcl.mju.ac.kr/research/mjvesc-
 8. install openocd
 
     `xpm install --global @gnu-mcu-eclipse/openocd`
-    
-  
+   
+@ Using 'gcc-arm-embedded' and 'openocd' (personally recommended)
+
+5. just set path in eclipse 
+
+    windows->preference->MCU
+     
+        Global Openocd Path -> /usr/bin
+   
+   done     
+        
 
 ## 2-2. eclipse setting @ windows, 2019-02-08
 1. install jdk
