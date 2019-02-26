@@ -25,7 +25,7 @@
 
 // Default app configuration
 #ifndef APPCONF_CONTROLLER_ID
-#define APPCONF_CONTROLLER_ID				0
+#define APPCONF_CONTROLLER_ID				2
 #endif
 #ifndef APPCONF_TIMEOUT_MSEC
 #define APPCONF_TIMEOUT_MSEC				1000
