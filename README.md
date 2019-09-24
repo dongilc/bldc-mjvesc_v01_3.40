@@ -138,3 +138,6 @@ More detail description for MJVESC is at https://drcl.mju.ac.kr/research/mjvesc-
    `-f board/stm32f4discovery.cfg`
    
 10. Click Run
+
+## License
+The software is released under the GNU General Public License version 3.0
