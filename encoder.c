@@ -307,6 +307,7 @@ void encoder_reset(void) {
 			bad_pulses = 0;
 		}
 
+#ifdef USE_CUSTOM_ABI_ENCODER_AT_SPI
 		//cdi
 		if ((index_found==true) && (hall_enc_hybrid_switch==false))
 		{
@@ -320,6 +321,7 @@ void encoder_reset(void) {
 			mcpwm_foc_change_sensor_mode_encoder();
 			hall_enc_hybrid_switch = true;
 		}
+#endif
 	}
 }
 

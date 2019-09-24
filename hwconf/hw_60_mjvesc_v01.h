@@ -23,7 +23,7 @@
 #define HW_NAME					"60_MJVESC_V01"	//cdi
 
 // USE HALL/ENC Hybrid, CDI
-#define HW_HAS_HALL_ENC_HYBRID
+//#define HW_HAS_HALL_ENC_HYBRID
 
 // HW properties
 #define HW_HAS_DRV8301
