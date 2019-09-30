@@ -262,6 +262,39 @@ static void cmd_pid_control_info(BaseSequentialStream *chp, int argc, char *argv
 	chprintf(chp, "pid_pos_now=%.2f, pid_pos_set=%.2f\r\n", (double)mcpwm_foc_get_pid_pos_now(), (double)mcpwm_foc_get_pid_pos_set());
 }
 
+static void cmd_dps_control_info1(BaseSequentialStream *chp, int argc, char *argv[]) {
+	(void)argv;
+	if (argc > 0) {
+		chprintf(chp, "Usage: dc1 <print dps control infomation 1>\r\n");
+		return;
+	}
+
+	chprintf(chp, "dps_target=%.2f, dps_actual=%.2f\r\n", 
+	(double)app_vescuino_dps_target(), (double)app_vescuino_dps_actual());
+}
+
+static void cmd_dps_control_info2(BaseSequentialStream *chp, int argc, char *argv[]) {
+	(void)argv;
+	if (argc > 0) {
+		chprintf(chp, "Usage: dc2 <print dps control infomation 2>\r\n");
+		return;
+	}
+
+	chprintf(chp, "s_prof=%.2f, s_actual=%.2f, tacho_prof=%.2f, tacho_actual=%.2f\r\n", 
+	(double)app_vescuino_dps_s_prof(), (double)app_vescuino_dps_s_actual(), (double)app_vescuino_dps_tacho_prof(), (double)app_vescuino_dps_tacho_actual());
+}
+
+static void cmd_dps_control_info3(BaseSequentialStream *chp, int argc, char *argv[]) {
+	(void)argv;
+	if (argc > 0) {
+		chprintf(chp, "Usage: dc3 <print dps control infomation 3>\r\n");
+		return;
+	}
+
+	chprintf(chp, "deg_target=%.2f, deg_actual=%.2f\r\n", 
+	(double)app_vescuino_dps_deg_target(), (double)app_vescuino_dps_tacho_actual());
+}
+
 static void cmd_imu_mpu9250_use_mode(BaseSequentialStream *chp, int argc, char *argv[]) {
 	(void)argv;
 	if (argc <= 0) {
@@ -537,6 +570,9 @@ static const ShellCommand commands[] = {
   {"gpn", cmd_get_polepair_num},
   {"ind", cmd_is_encoder_index_found},
   {"pif", cmd_pid_control_info},
+  {"dc1", cmd_dps_control_info1},
+  {"dc2", cmd_dps_control_info2},
+  {"dc3", cmd_dps_control_info3},
   {"lcd", cmd_can_dev_print},
   {"dev", cmd_spi_devel_print},
   {"sdp", cmd_spi_debug_print},

@@ -63,7 +63,8 @@ void app_nunchuk_get_normalized_data(nunchuk_data_norm *chuk_data_norm); //cdi
 void app_custom_start(void);
 void app_custom_stop(void);
 void app_custom_configure(app_configuration *conf);
-void app_vescuino_set_dps(float dps);	// @ app_vescuino_dps_control.c
+void app_vescuino_set_dps(float dps);   // @ app_vescuino_dps_control.c
+void app_vescuino_set_goto(float deg);	// @ app_vescuino_dps_control.c
 
 // cdi util
 double app_util_cdi_lowpass_filter_double(double in, double *out_prev, double hz, double dt);

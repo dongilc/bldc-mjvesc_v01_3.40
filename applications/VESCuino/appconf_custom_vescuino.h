@@ -21,7 +21,7 @@
 #define APPCONF_APPCONF_CUSTOM_VESCUINO_H_
 
 // override app to use
-#define APPCONF_APP_TO_USE					APP_UART	//APP_UART	//APP_CUSTOM
+#define APPCONF_APP_TO_USE					APP_CUSTOM	//APP_UART	//APP_CUSTOM
 
 // Default app configuration
 #ifndef APPCONF_CONTROLLER_ID

@@ -180,9 +180,14 @@ static void send_custom_app_data(unsigned char *data, unsigned int len) {
 						spi_comm_set_index[i] = COMM_SET_POS;
 						break;
 					case COMM_SET_DPS:
-						value_set[i] = (float)buffer_get_int32(data, &ind);
+						value_set[i] = (float)buffer_get_int32(data, &ind) / 1000.0;
 						app_vescuino_set_dps(value_set[i]);
 						spi_comm_set_index[i] = COMM_SET_DPS;
+						break;
+					case COMM_SET_GOTO:
+						value_set[i] = (float)buffer_get_int32(data, &ind) / 1000.0 ;
+						app_vescuino_set_goto(value_set[i]);
+						spi_comm_set_index[i] = COMM_SET_GOTO;
 						break;
 					default:
 						spi_comm_set_index[i] = -1;	//error
@@ -221,8 +226,8 @@ static void send_custom_app_data(unsigned char *data, unsigned int len) {
 						if(msg!=0) comm_can_set_pos(id_set[i], value_set[i]);
 						break;
 					case COMM_SET_DPS:
-						value_set[i] = (float)buffer_get_int32(data, &ind);
-						//app_vescuino_set_dps(value_set[i]);
+						value_set[i] = (float)buffer_get_int32(data, &ind) / 100.0;
+						app_vescuino_set_dps(value_set[i]);
 						spi_comm_set_index[i] = COMM_SET_DPS;
 						if(msg!=0) comm_can_set_dps(id_set[i], value_set[i]);
 						break;
