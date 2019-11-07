@@ -151,30 +151,35 @@ static void send_custom_app_data(unsigned char *data, unsigned int len) {
 				switch(comm_set[i]) {
 					case COMM_SET_DUTY:
 						value_set[i] = (float)buffer_get_int32(data, &ind) / 100000.0;
+						if(app_vescuino_dps_get_dps_set_flag()) app_vescuino_dps_set_dps_set_flag(0);
 						mc_interface_set_duty(value_set[i]);
 						timeout_reset();
 						spi_comm_set_index[i] = COMM_SET_DUTY;
 						break;
 					case COMM_SET_CURRENT:
 						value_set[i] = (float)buffer_get_int32(data, &ind) / 1000.0;
+						if(app_vescuino_dps_get_dps_set_flag()) app_vescuino_dps_set_dps_set_flag(0);
 						mc_interface_set_current(value_set[i]);
 						timeout_reset();
 						spi_comm_set_index[i] = COMM_SET_CURRENT;
 						break;
 					case COMM_SET_CURRENT_BRAKE:
 						value_set[i] = (float)buffer_get_int32(data, &ind) / 1000.0;
+						if(app_vescuino_dps_get_dps_set_flag()) app_vescuino_dps_set_dps_set_flag(0);
 						mc_interface_set_brake_current(value_set[i]);
 						timeout_reset();
 						spi_comm_set_index[i] = COMM_SET_CURRENT_BRAKE;
 						break;
 					case COMM_SET_RPM:
 						value_set[i] = (float)buffer_get_int32(data, &ind);
+						if(app_vescuino_dps_get_dps_set_flag()) app_vescuino_dps_set_dps_set_flag(0);
 						mc_interface_set_pid_speed(value_set[i]);
 						timeout_reset();
 						spi_comm_set_index[i] = COMM_SET_RPM;
 						break;
 					case COMM_SET_POS:
 						value_set[i] = (float)buffer_get_int32(data, &ind) / 1000000.0;
+						if(app_vescuino_dps_get_dps_set_flag()) app_vescuino_dps_set_dps_set_flag(0);
 						mc_interface_set_pid_pos(value_set[i]);
 						timeout_reset();
 						spi_comm_set_index[i] = COMM_SET_POS;
@@ -226,10 +231,14 @@ static void send_custom_app_data(unsigned char *data, unsigned int len) {
 						if(msg!=0) comm_can_set_pos(id_set[i], value_set[i]);
 						break;
 					case COMM_SET_DPS:
-						value_set[i] = (float)buffer_get_int32(data, &ind) / 100.0;
-						app_vescuino_set_dps(value_set[i]);
+						value_set[i] = (float)buffer_get_int32(data, &ind) / 1000.0;
 						spi_comm_set_index[i] = COMM_SET_DPS;
 						if(msg!=0) comm_can_set_dps(id_set[i], value_set[i]);
+						break;
+					case COMM_SET_GOTO:
+						value_set[i] = (float)buffer_get_int32(data, &ind) / 1000.0 ;
+						spi_comm_set_index[i] = COMM_SET_GOTO;
+						if(msg!=0) comm_can_set_goto(id_set[i], value_set[i]);
 						break;
 					default:
 						spi_comm_set_index[i] = -1;	//error
@@ -269,8 +278,10 @@ static void send_custom_app_data(unsigned char *data, unsigned int len) {
 	send_buffer[ind++] = mc_interface_get_fault();
 	buffer_append_float32(send_buffer, mc_interface_get_pid_pos_now(), 1e6, &ind);
 	//cdi
-	buffer_append_float32(send_buffer, encoder_read_rps(), 1e5, &ind);
-	buffer_append_float32(send_buffer, encoder_read_rad(), 1e2, &ind);
+	buffer_append_float32(send_buffer, encoder_read_rps(), 1e5, &ind);	// read from 1khz encoder.c
+	buffer_append_float32(send_buffer, encoder_read_rad(), 1e2, &ind);	// read from 1khz encoder.c	- incremental position
+	//buffer_append_float32(send_buffer, app_vescuino_dps_actual(), 1e3, &ind);		// read from 10khz app_vescuino_dps_control.c - absolute position
+	//buffer_append_float32(send_buffer, app_vescuino_dps_tacho_actual(), 1e3, &ind);	// read from 10khz app_vescuino_dps_control.c - absolute position
 
 	// can status msg
 	spi_send_mode = 81;
@@ -291,6 +302,8 @@ static void send_custom_app_data(unsigned char *data, unsigned int len) {
 			//buffer_append_int32(send_buffer, can_st_msg->tachometer, &ind);		// modified can_status_msg
 			buffer_append_float32(send_buffer, can_st_msg->rps, 1e5, &ind);		// modified can_status_msg
 			buffer_append_float32(send_buffer, can_st_msg->rad, 1e2, &ind);		// modified can_status_msg
+			//buffer_append_float32(send_buffer, can_st_msg->dps, 1e3, &ind);		// modified can_status_msg
+			//buffer_append_float32(send_buffer, can_st_msg->deg, 1e3, &ind);		// modified can_status_msg
 			active_can_devs[can_st_msg->id] = 1;
 		}
 		else	active_can_devs[can_st_msg->id] = 0;

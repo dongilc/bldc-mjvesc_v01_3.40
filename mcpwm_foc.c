@@ -110,6 +110,14 @@ static volatile float m_pos_pid_now;
 static volatile bool m_init_done;
 static volatile float m_gamma_now;
 
+//cdi
+static volatile int m_pos_pid_abs_init;
+static volatile double m_pos_s_temp;
+static volatile double m_pos_s_actual;
+static volatile double m_pos_ds;
+static volatile double m_pos_pid_abs_now;
+static volatile double m_pos_pid_abs_set;
+
 #ifdef HW_HAS_3_SHUNTS
 static volatile int m_curr2_sum;
 static volatile int m_curr2_offset;
@@ -125,6 +133,7 @@ static void control_current(volatile motor_state_t *state_m, float dt);
 static void svm(float alpha, float beta, uint32_t PWMHalfPeriod,
 		uint32_t* tAout, uint32_t* tBout, uint32_t* tCout, uint32_t *svm_sector);
 static void run_pid_control_pos(float angle_now, float angle_set, float dt);
+static void run_pid_control_pos_abs(double angle_abs_now, double angle_abs_set, float dt);	// cdi
 static void run_pid_control_speed(float dt);
 static void stop_pwm_hw(void);
 static void start_pwm_hw(void);
@@ -186,6 +195,10 @@ static volatile bool timer_thd_stop;
 		TIM1->CR1 &= ~TIM_CR1_UDIS; \
 		TIM8->CR1 &= ~TIM_CR1_UDIS;
 #endif
+
+double mcpwm_foc_pid_pos_abs_get(void) {
+	return m_pos_pid_abs_now;
+}
 
 void mcpwm_foc_init(volatile mc_configuration *configuration) {
 	utils_sys_lock_cnt();
@@ -560,6 +573,16 @@ void mcpwm_foc_set_pid_speed(float rpm) {
 void mcpwm_foc_set_pid_pos(float pos) {
 	m_control_mode = CONTROL_MODE_POS;
 	m_pos_pid_set = pos;
+
+	if (m_state != MC_STATE_RUNNING) {
+		m_state = MC_STATE_RUNNING;
+	}
+}
+
+//cdi
+void mcpwm_foc_set_pid_pos_abs(double pos) {
+	m_control_mode = CONTROL_MODE_POS_ABS;
+	m_pos_pid_abs_set = pos;
 
 	if (m_state != MC_STATE_RUNNING) {
 		m_state = MC_STATE_RUNNING;
@@ -1920,6 +1943,7 @@ void mcpwm_foc_adc_int_handler(void *p, uint32_t flags) {
 	float angle_now = 0.0;
 	if (encoder_is_configured()) {
 		angle_now = enc_ang;
+		m_pos_pid_abs_init = 1;	//cdi
 	} else {
 		angle_now = m_motor_state.phase * (180.0 / M_PI);
 	}
@@ -1934,9 +1958,31 @@ void mcpwm_foc_adc_int_handler(void *p, uint32_t flags) {
 		utils_norm_angle((float*)&m_pos_pid_now);
 	}
 
+	//cdi
+	//accumulated angle deg
+	if(m_pos_pid_abs_init==0) {
+		m_pos_pid_abs_now = m_pos_pid_now;
+		m_pos_s_temp = m_pos_s_actual = m_pos_pid_abs_now;
+		m_pos_ds = 0.;
+	}
+	else {
+		m_pos_s_temp = m_pos_s_actual;
+		m_pos_s_actual = m_pos_pid_now;
+		m_pos_ds = m_pos_s_actual - m_pos_s_temp;
+		m_pos_pid_abs_now += (double)m_pos_ds;	
+	}
+	if(m_pos_ds > (double)(60.)) {
+		m_pos_pid_abs_now -= (double)360.;
+	}
+	else if(m_pos_ds < (double)(-60.)) {
+		m_pos_pid_abs_now += (double)360.;
+	}
+	//cdi
+	
 	// Run position control
 	if (m_state == MC_STATE_RUNNING) {
 		run_pid_control_pos(m_pos_pid_now, m_pos_pid_set, dt);
+		run_pid_control_pos_abs(m_pos_pid_abs_now, m_pos_pid_abs_set, dt);
 	}
 
 	// MCIF handler
@@ -2403,6 +2449,74 @@ static void svm(float alpha, float beta, uint32_t PWMHalfPeriod,
 	*tBout = tB;
 	*tCout = tC;
 	*svm_sector = sector;
+}
+
+//cdi
+static void run_pid_control_pos_abs(double angle_abs_now, double angle_abs_set, float dt) {
+	static float i_term = 0;
+	static float prev_error = 0;
+	float p_term;
+	float d_term;
+
+	// PID is off. Return.
+	if (m_control_mode != CONTROL_MODE_POS_ABS) {
+		i_term = 0;
+		prev_error = 0;
+		return;
+	}
+
+	// Compute parameters
+	float error = angle_abs_set - angle_abs_now;//utils_angle_difference(angle_abs_set, angle_abs_now);
+
+	if (encoder_is_configured()) {
+		if (m_conf->foc_encoder_inverted) {
+			error = -error;
+		}
+	}
+
+	p_term = error * m_conf->p_pid_kp;
+	i_term += error * (m_conf->p_pid_ki * dt);
+
+	// Average DT for the D term when the error does not change. This likely
+	// happens at low speed when the position resolution is low and several
+	// control iterations run without position updates.
+	// TODO: Are there problems with this approach?
+	static float dt_int = 0.0;
+	dt_int += dt;
+	if (error == prev_error) {
+		d_term = 0.0;
+	} else {
+		d_term = (error - prev_error) * (m_conf->p_pid_kd / dt_int);
+		dt_int = 0.0;
+	}
+
+	// Filter D
+	static float d_filter = 0.0;
+	UTILS_LP_FAST(d_filter, d_term, m_conf->p_pid_kd_filter);
+	d_term = d_filter;
+
+
+	// I-term wind-up protection
+	utils_truncate_number_abs(&p_term, 1.0);
+	utils_truncate_number_abs(&i_term, 1.0 - fabsf(p_term));
+
+	// Store previous error
+	prev_error = error;
+
+	// Calculate output
+	float output = p_term + i_term + d_term;
+	utils_truncate_number(&output, -1.0, 1.0);
+
+	if (encoder_is_configured()) {
+		if (encoder_index_found()) {
+			m_iq_set = output * m_conf->lo_current_max;
+		} else {
+			// Rotate the motor with 40 % power until the encoder index is found.
+			m_iq_set = 0.4 * m_conf->lo_current_max;
+		}
+	} else {
+		m_iq_set = output * m_conf->lo_current_max;
+	}
 }
 
 static void run_pid_control_pos(float angle_now, float angle_set, float dt) {

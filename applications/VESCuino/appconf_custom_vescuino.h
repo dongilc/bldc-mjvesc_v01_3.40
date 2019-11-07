@@ -50,7 +50,7 @@
 // Custom Setting CDI
 //APP
 #ifndef CUSTOM_APP_MODE
-#define CUSTOM_APP_MODE							0	// 0:VESCuino SPI, 1:SMG, 2:Differential Robot
+#define CUSTOM_APP_MODE							CUSTOM_APP_VESCuino //CUSTOM_APP_HUBOQ_REMASTERED	// 0:VESCuino SPI, 1:SMG, 2:Differential Robot, 
 #endif
 //IMU
 #ifndef CUSTOM_IMU_USE_MODE

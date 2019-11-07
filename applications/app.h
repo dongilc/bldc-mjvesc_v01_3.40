@@ -65,6 +65,9 @@ void app_custom_stop(void);
 void app_custom_configure(app_configuration *conf);
 void app_vescuino_set_dps(float dps);   // @ app_vescuino_dps_control.c
 void app_vescuino_set_goto(float deg);	// @ app_vescuino_dps_control.c
+void app_vescuino_set_free(void);	    // @ app_vescuino_dps_control.c
+float app_vescuino_dps_actual(void);    // @ app_vescuino_dps_control.c
+double app_vescuino_dps_tacho_actual(void);	// @ app_vescuino_dps_control.c
 
 // cdi util
 double app_util_cdi_lowpass_filter_double(double in, double *out_prev, double hz, double dt);

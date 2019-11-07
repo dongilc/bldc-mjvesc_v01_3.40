@@ -87,7 +87,8 @@ typedef enum {
 	CONTROL_MODE_POS,
 	CONTROL_MODE_HANDBRAKE,
 	CONTROL_MODE_OPENLOOP,
-	CONTROL_MODE_NONE
+	CONTROL_MODE_NONE,
+	CONTROL_MODE_POS_ABS,
 } mc_control_mode;
 
 typedef enum {
@@ -432,7 +433,8 @@ typedef struct {
 typedef enum {
 	CUSTOM_APP_VESCuino = 0,
 	CUSTOM_APP_SMG_FULL_METAL,
-	CUSTOM_APP_DIFF_ROBOT
+	CUSTOM_APP_DIFF_ROBOT,
+	CUSTOM_APP_HUBOQ_REMASTERED
 } CUSTOM_APPs;
 
 typedef struct {
@@ -585,8 +587,9 @@ typedef enum {
 	CAN_PACKET_SET_CURRENT_HANDBRAKE,
 	CAN_PACKET_SET_CURRENT_HANDBRAKE_REL,
 	CAN_PACKET_SET_ENCODER_RESET,	//cdi
-	CAN_PACKET_SET_DPS,		//cdi
-	CAN_PACKET_SET_GOTO		//cdi
+	CAN_PACKET_SET_DPS,			//cdi
+	CAN_PACKET_SET_GOTO,		//cdi
+	CAN_PACKET_SET_REBOOT		//cdi
 } CAN_PACKET_ID;
 
 // Logged fault data
@@ -637,6 +640,8 @@ typedef struct {
 	float duty;
 	float rps;	//cdi
 	float rad;	//cdi
+	float dps;	//cdi
+	float deg;	//cdi
 } can_status_msg;
 
 typedef struct {

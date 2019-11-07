@@ -169,6 +169,7 @@ static THD_FUNCTION(cancom_process_thread, arg) {
 				CAN_PACKET_ID cmd = rxmsg.EID >> 8;
 				can_status_msg *stat_tmp;
 
+				// This is CAN message RX part - cdi
 				if (id == 255 || id == app_get_configuration()->controller_id) {
 					switch (cmd) {
 					case CAN_PACKET_SET_DUTY:
@@ -288,11 +289,27 @@ static THD_FUNCTION(cancom_process_thread, arg) {
 						app_vescuino_set_dps((float)buffer_get_float32(rxmsg.data8, 1e0, &ind));
 						break;
 
+					case CAN_PACKET_SET_GOTO:
+						// cdi
+						ind = 0;
+						app_vescuino_set_goto((float)buffer_get_float32(rxmsg.data8, 1e0, &ind));
+						break;
+
+					case CAN_PACKET_SET_REBOOT:
+						// cdi
+						// Lock the system and enter an infinite loop. The watchdog will reboot.
+						debug_printf("\r\nrebooting...");
+						chThdSleepMilliseconds(1000);
+						__disable_irq();
+						for(;;){};
+						break;
+
 					default:
 						break;
 					}
 				}
 
+				// This is Periodic CAN Status message RX part - cdi
 				switch (cmd) {
 				case CAN_PACKET_STATUS:
 					for (int i = 0;i < CAN_STATUS_MSGS_TO_STORE;i++) {
@@ -311,6 +328,8 @@ static THD_FUNCTION(cancom_process_thread, arg) {
 							//stat_tmp->tachometer = buffer_get_int32(rxmsg.data8, &ind);
 							stat_tmp->rps = buffer_get_float32(rxmsg.data8, 1e5, &ind);	//cdi
 							stat_tmp->rad = buffer_get_float32(rxmsg.data8, 1e2, &ind);
+							//stat_tmp->dps = buffer_get_float32(rxmsg.data8, 1e3, &ind);	//cdi
+							//stat_tmp->deg = buffer_get_float32(rxmsg.data8, 1e3, &ind);
 #endif
 							break;
 						}
@@ -337,6 +356,7 @@ static THD_FUNCTION(cancom_status_thread, arg) {
 	(void)arg;
 	chRegSetThreadName("CAN status");
 
+	// This is Periodic CAN Status message TX part - cdi
 	for(;;) {
 		if (app_get_configuration()->send_can_status) {
 			// Send status message
@@ -349,8 +369,10 @@ static THD_FUNCTION(cancom_status_thread, arg) {
 			buffer_append_int16(buffer, (int16_t)(mc_interface_get_duty_cycle_now() * 1000.0), &send_index);
 #else
 			//buffer_append_int32(buffer, mc_interface_get_tachometer_value(false), &send_index);
-			buffer_append_float32(buffer, encoder_read_rps(), 1e5, &send_index);
-			buffer_append_float32(buffer, encoder_read_rad(), 1e2, &send_index);
+			buffer_append_float32(buffer, encoder_read_rps(), 1e5, &send_index);	// read from 1khz encoder.c
+			buffer_append_float32(buffer, encoder_read_rad(), 1e2, &send_index);	// read from 1khz encoder.c	- incremental position
+			//buffer_append_float32(buffer, app_vescuino_dps_actual(), 1e3, &send_index);			// read from 10khz app_vescuino_dps_control.c - absolute position
+			//buffer_append_float32(buffer, app_vescuino_dps_tacho_actual(), 1e3, &send_index);	// read from 10khz app_vescuino_dps_control.c - absolute position
 #endif
 			comm_can_transmit_eid(app_get_configuration()->controller_id |
 					((uint32_t)CAN_PACKET_STATUS << 8), buffer, send_index);
@@ -551,6 +573,14 @@ void comm_can_set_dps(uint8_t controller_id, float dps) {
 	buffer_append_int32(buffer, (int32_t)(dps), &send_index);
 	comm_can_transmit_eid(controller_id |
 			((uint32_t)CAN_PACKET_SET_DPS << 8), buffer, send_index);
+}
+
+void comm_can_set_goto(uint8_t controller_id, float tacho_deg) {
+	int32_t send_index = 0;
+	uint8_t buffer[4];
+	buffer_append_int32(buffer, (int32_t)(tacho_deg), &send_index);
+	comm_can_transmit_eid(controller_id |
+			((uint32_t)CAN_PACKET_SET_GOTO << 8), buffer, send_index);
 }
 
 /**

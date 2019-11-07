@@ -155,7 +155,7 @@ void encoder_init_abi(uint32_t counts) {
 	// Initialize variables
 	//cdi
 #ifdef USE_CUSTOM_ABI_ENCODER_AT_SPI
-	index_found = true;	// cheat as if encoder index is already found
+	//index_found = true;	// cheat as if encoder index is already found
 	hall_enc_hybrid_switch = false;
 #else
 	index_found = false;

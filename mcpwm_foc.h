@@ -72,9 +72,12 @@ bool mcpwm_foc_measure_res_ind(float *res, float *ind);
 bool mcpwm_foc_hall_detect(float current, uint8_t *hall_table);
 void mcpwm_foc_print_state(void);
 float mcpwm_foc_get_last_inj_adc_isr_duration(void);
+
 //cdi
 int mcpwm_foc_check_sensor_mode(void);
 void mcpwm_foc_change_sensor_mode_encoder(void);
+double mcpwm_foc_pid_pos_abs_get(void);
+void mcpwm_foc_set_pid_pos_abs(double);
 
 // Interrupt handlers
 void mcpwm_foc_tim_sample_int_handler(void);

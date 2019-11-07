@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "comm_can.h": "c",
+        "commands.h": "c",
+        "app.h": "c",
+        "chrono": "c",
+        "limits": "c",
+        "app_huboq_remastered.h": "c",
+        "isr_vector_table.h": "c",
+        "app_vescuino_dps_control.h": "c",
+        "mc_interface.h": "c",
+        "mcpwm_foc.h": "c",
+        "app_smg_full_metal_control.h": "c"
+    }
+}

@@ -39,6 +39,7 @@ void comm_can_set_current_brake(uint8_t controller_id, float current);
 void comm_can_set_rpm(uint8_t controller_id, float rpm);
 void comm_can_set_pos(uint8_t controller_id, float pos);
 void comm_can_set_dps(uint8_t controller_id, float dps);	//cdi
+void comm_can_set_goto(uint8_t controller_id, float tacho_deg);  //cdi
 void comm_can_set_current_rel(uint8_t controller_id, float current_rel);
 void comm_can_set_current_brake_rel(uint8_t controller_id, float current_rel);
 void comm_can_set_encoder_reset(uint8_t controller_id);	//cdi

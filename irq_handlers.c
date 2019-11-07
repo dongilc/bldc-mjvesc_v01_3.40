@@ -25,6 +25,8 @@
 #include "mcpwm_foc.h"
 #include "hw.h"
 #include "encoder.h"
+#include "VESCuino/app_vescuino.h"
+#include "VESCuino/app_huboq_remastered.h"
 
 CH_IRQ_HANDLER(ADC1_2_3_IRQHandler) {
 	CH_IRQ_PROLOGUE();
@@ -39,6 +41,16 @@ CH_IRQ_HANDLER(HW_ENC_EXTI_ISR_VEC) {
 
 		// Clear the EXTI line pending bit
 		EXTI_ClearITPendingBit(HW_ENC_EXTI_LINE);
+	}
+}
+
+CH_IRQ_HANDLER(EXTI15_10_IRQHandler) {
+	if (EXTI_GetITStatus(EXTI_Line10) != RESET) {
+		// limit sw detected
+		app_huboq_set_limit_sw_status(true);
+
+		// Clear the EXTI line pending bit
+		EXTI_ClearITPendingBit(EXTI_Line10);
 	}
 }
 

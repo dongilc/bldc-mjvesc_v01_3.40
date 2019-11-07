@@ -23,6 +23,7 @@
 #include "app_vescuino_mpu9250.c"
 #include "app_smg_full_metal_control.c"
 #include "app_diff_robot_control.c"
+#include "app_huboq_remastered.c"
 
 // Defines
 #define SHELL_WA_SIZE   	THD_WORKING_AREA_SIZE(2048)
@@ -109,10 +110,22 @@ static void sys_reboot(void)
 static void cmd_reboot(BaseSequentialStream *chp, int argc, char *argv[]) {
 	(void)argv;
 	if (argc > 0) {
-		chprintf(chp, "Usage: rb\r\n");
+		chprintf(chp, "Usage: rb (reboot)\r\n");
 		return;
 	}
 
+	sys_reboot();
+}
+
+static void cmd_reboot_all(BaseSequentialStream *chp, int argc, char *argv[]) {
+	(void)argv;
+	if (argc > 0) {
+		chprintf(chp, "Usage: rba (reboot all)\r\n");
+		return;
+	}
+
+	debug_printf("\r\nrebooting can devs...");
+	comm_can_transmit_eid(255 | ((uint32_t)CAN_PACKET_SET_REBOOT << 8), 0, 0);		
 	sys_reboot();
 }
 
@@ -262,6 +275,19 @@ static void cmd_pid_control_info(BaseSequentialStream *chp, int argc, char *argv
 	chprintf(chp, "pid_pos_now=%.2f, pid_pos_set=%.2f\r\n", (double)mcpwm_foc_get_pid_pos_now(), (double)mcpwm_foc_get_pid_pos_set());
 }
 
+static void cmd_dps_control_general_info(BaseSequentialStream *chp, int argc, char *argv[]) {
+	(void)argv;
+	if (argc > 0) {
+		chprintf(chp, "Usage: dps <print dps control general infomation 1>\r\n");
+		return;
+	}
+
+	chprintf(chp, "dps_set=%d, vel limit=%.2f, acc limit=%.2f, goto_kp=%.2f, enc_offset_deg=%.2f\r\n", 
+					app_vescuino_dps_get_dps_set_flag(), 
+					(double)app_vescuino_dps_get_vel_maximum(), (double)app_vescuino_dps_get_acc_maximum(),
+					(double)app_vescuino_dps_get_goto_kp(), (double)app_vescuino_dps_get_enc_offset());
+}
+
 static void cmd_dps_control_info1(BaseSequentialStream *chp, int argc, char *argv[]) {
 	(void)argv;
 	if (argc > 0) {
@@ -280,8 +306,8 @@ static void cmd_dps_control_info2(BaseSequentialStream *chp, int argc, char *arg
 		return;
 	}
 
-	chprintf(chp, "s_prof=%.2f, s_actual=%.2f, tacho_prof=%.2f, tacho_actual=%.2f\r\n", 
-	(double)app_vescuino_dps_s_prof(), (double)app_vescuino_dps_s_actual(), (double)app_vescuino_dps_tacho_prof(), (double)app_vescuino_dps_tacho_actual());
+	chprintf(chp, "s_prof=%.2f, s_actual=%.2f, tacho_prof=%.2f, tacho_actual=%.2f, m_angle_abs_now=%.2f\r\n", 
+	(double)app_vescuino_dps_s_prof(), (double)app_vescuino_dps_s_actual(), (double)app_vescuino_dps_tacho_prof(), (double)app_vescuino_dps_tacho_actual(), (double)mcpwm_foc_pid_pos_abs_get());
 }
 
 static void cmd_dps_control_info3(BaseSequentialStream *chp, int argc, char *argv[]) {
@@ -293,6 +319,63 @@ static void cmd_dps_control_info3(BaseSequentialStream *chp, int argc, char *arg
 
 	chprintf(chp, "deg_target=%.2f, deg_actual=%.2f\r\n", 
 	(double)app_vescuino_dps_deg_target(), (double)app_vescuino_dps_tacho_actual());
+}
+
+static void cmd_dps_control_param_set(BaseSequentialStream *chp, int argc, char *argv[]) {
+	(void)argv;
+	if (argc < 2) {
+		chprintf(chp, "Usage: dps_p 25000.0 100000.0 <set dps control Vel, Acc limit>\r\n");
+		return;
+	}
+
+	float v_limit = 25000.;
+	float a_limit = 100000.0;
+	if(argc>0) v_limit = atof(argv[0]);
+	if(argc>1) a_limit = atof(argv[1]);
+
+	if(argc==2) {
+		app_vescuino_dps_set_vel_maximum(v_limit);
+		app_vescuino_dps_set_acc_maximum(a_limit);
+	}
+	else chprintf(chp, "Usage: dps_p 25000.0 100000.0\r\n");
+}
+
+static void cmd_goto_control_param_set(BaseSequentialStream *chp, int argc, char *argv[]) {
+	(void)argv;
+	if (argc < 1) {
+		chprintf(chp, "Usage: goto_p 7.0 <set goto control Kp gain>\r\n");
+		return;
+	}
+
+	float goto_kp = 7.;
+	if(argc>0) goto_kp = atof(argv[0]);
+
+	if(argc==1) {
+		app_vescuino_dps_set_goto_kp(goto_kp);
+	}
+	else chprintf(chp, "Usage: goto_p 7.0\r\n");
+}
+
+static void cmd_huboq_status_print(BaseSequentialStream *chp, int argc, char *argv[]) {
+	(void)argv;
+	if (argc > 0) {
+		chprintf(chp, "Usage: hqs <print huboq status\r\n");
+		return;
+	}
+
+	debug_printf("limit sw flag:%d\r\n", app_huboq_get_limit_sw_status());
+	//chprintf(chp, "limit sw flag:%d\r\n", app_huboq_get_limit_sw_status());
+}
+
+static void cmd_huboq_find_home(BaseSequentialStream *chp, int argc, char *argv[]) {
+	(void)argv;
+	if (argc > 0) {
+		chprintf(chp, "Usage: hqh <find home position>\r\n");
+		return;
+	}
+
+	debug_printf("finding home position\r\n");
+	app_huboq_find_home();
 }
 
 static void cmd_imu_mpu9250_use_mode(BaseSequentialStream *chp, int argc, char *argv[]) {
@@ -567,12 +650,18 @@ static const ShellCommand commands[] = {
   {"mem", cmd_mem},
   {"threads", cmd_threads},
   {"rb", cmd_reboot},
+  {"rba", cmd_reboot_all},
   {"gpn", cmd_get_polepair_num},
   {"ind", cmd_is_encoder_index_found},
   {"pif", cmd_pid_control_info},
+  {"dps", cmd_dps_control_general_info},
   {"dc1", cmd_dps_control_info1},
   {"dc2", cmd_dps_control_info2},
   {"dc3", cmd_dps_control_info3},
+  {"dps_p", cmd_dps_control_param_set},
+  {"goto_p", cmd_goto_control_param_set},
+  {"hqs", cmd_huboq_status_print},
+  {"hqh", cmd_huboq_find_home},
   {"lcd", cmd_can_dev_print},
   {"dev", cmd_spi_devel_print},
   {"sdp", cmd_spi_debug_print},
@@ -738,6 +827,20 @@ static THD_FUNCTION(app_vescuino_thread, arg) {
 	{
 		debug_printf("\r\nStart Differential Robot Control Thread");
 		app_diff_robot_thread_start();
+	}
+	else if(appconf->app_custom.custom_app_mode==CUSTOM_APP_HUBOQ_REMASTERED)
+	{
+		debug_printf("\r\nStart HuboQ Remastered Thread");
+		app_huboq_limit_sw_init();
+
+		// custom app
+		commands_set_app_data_handler(send_custom_app_data);
+
+		// COMM_SET_DPS Thread
+		app_vescuino_set_dps_thread_start();
+
+		// Huboq Remastered Thread
+		app_huboq_remastered_thread_start();
 	}
 
 	// MPU9250 Start
